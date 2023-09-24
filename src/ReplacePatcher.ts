@@ -110,6 +110,11 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             this.log.error(`ReplacePatcher do_patch() invalid params p: ${ri.mod.name} ${JSON.stringify(params)}`);
             return;
         }
+        console.log('ReplacePatcher do_patch() start.', [ri.mod]);
+        this.log.log(`ReplacePatcher do_patch() start: ${ri.mod.name}`);
+        console.log('params.js', params.js);
+        console.log('params.css', params.css);
+        console.log('params.twee', params.twee);
         this.patchInReplaceParamsItem(params.js ?? [], sc.scriptFileItems);
         this.patchInReplaceParamsItem(params.css ?? [], sc.styleFileItems);
         this.patchInReplaceParamsItemTwee(params.twee ?? [], sc.passageDataItems);
@@ -125,15 +130,11 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
                 this.log.error(`ReplacePatcher patchInReplaceParamsItem() cannot find file: ${rp.fileName}`);
                 continue;
             }
-            const nn = f.content.search(rp.from);
+            const nn = f.content.indexOf(rp.from);
             if (nn < 0) {
                 console.error('ReplacePatcher patchInReplaceParamsItem() (f.content.search(rp.from) < 0).', [rp]);
                 this.log.error(`ReplacePatcher patchInReplaceParamsItem() cannot find 'from': ${rp.from} in:${rp.fileName}`);
                 continue;
-            }
-            if (nn > 0) {
-                console.warn('ReplacePatcher patchInReplaceParamsItem() (nn > 0).', [rp]);
-                this.log.warn(`ReplacePatcher patchInReplaceParamsItem() find multi 'from': ${rp.from} in:${rp.fileName}`);
             }
             f.content = f.content.replace(rp.from, rp.to);
             console.log('ReplacePatcher patchInReplaceParamsItem() done.', [rp]);
@@ -149,15 +150,11 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
                 this.log.error(`ReplacePatcher patchInReplaceParamsItemTwee() cannot find passageName: ${rp.passageName}`);
                 continue;
             }
-            const nn = f.content.search(rp.from);
+            const nn = f.content.indexOf(rp.from);
             if (nn < 0) {
                 console.error('ReplacePatcher patchInReplaceParamsItemTwee() (f.content.search(rp.from) < 0).', [rp]);
                 this.log.error(`ReplacePatcher patchInReplaceParamsItemTwee() cannot find 'from': ${rp.from} in:${rp.passageName}`);
                 continue;
-            }
-            if (nn > 0) {
-                console.warn('ReplacePatcher patchInReplaceParamsItemTwee() (nn > 0).', [rp]);
-                this.log.warn(`ReplacePatcher patchInReplaceParamsItemTwee() find multi 'from': ${rp.from} in:${rp.passageName}`);
             }
             f.content = f.content.replace(rp.from, rp.to);
             console.log('ReplacePatcher patchInReplaceParamsItemTwee() done.', [rp]);
