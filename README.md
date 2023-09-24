@@ -33,8 +33,7 @@ this mod export addon:
           {
             "passageName": "Widgets Lower Clothing",
             "from": "<span>Widgets:</span>",
-            "to": "<span>小部件:</span>",
-            "fileName": "debugMenu.twee"
+            "to": "<span>小部件:</span>"
           }
         ]
       }
