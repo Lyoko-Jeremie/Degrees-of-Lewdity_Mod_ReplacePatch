@@ -115,9 +115,18 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
         console.log('params.js', params.js);
         console.log('params.css', params.css);
         console.log('params.twee', params.twee);
-        this.patchInReplaceParamsItem(params.js ?? [], sc.scriptFileItems);
-        this.patchInReplaceParamsItem(params.css ?? [], sc.styleFileItems);
-        this.patchInReplaceParamsItemTwee(params.twee ?? [], sc.passageDataItems);
+        if (params.js) {
+            this.patchInReplaceParamsItem(params.js ?? [], sc.scriptFileItems);
+            sc.scriptFileItems.back2Array();
+        }
+        if (params.css) {
+            this.patchInReplaceParamsItem(params.css ?? [], sc.styleFileItems);
+            sc.styleFileItems.back2Array();
+        }
+        if (params.twee) {
+            this.patchInReplaceParamsItemTwee(params.twee ?? [], sc.passageDataItems);
+            sc.passageDataItems.back2Array();
+        }
         console.log('ReplacePatcher do_patch() done.', [ri.mod]);
         this.log.log(`ReplacePatcher do_patch() done: ${ri.mod.name}`);
     }
