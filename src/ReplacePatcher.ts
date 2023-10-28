@@ -5,6 +5,7 @@ import type {ModZipReader} from "../../../dist-BeforeSC2/ModZipReader";
 import type {SC2DataInfo} from "../../../dist-BeforeSC2/SC2DataInfoCache";
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
+import {isNil} from "lodash";
 
 interface ReplaceInfo {
     addonName: string;
@@ -17,6 +18,7 @@ export interface ReplaceParamsItem {
     to: string;
     fileName: string;
     debug?: boolean;
+    all?: boolean;
 }
 
 export interface ReplaceParamsItemTwee {
@@ -24,6 +26,7 @@ export interface ReplaceParamsItemTwee {
     from: string;
     to: string;
     debug?: boolean;
+    all?: boolean;
 }
 
 export interface ReplaceParams {
@@ -73,7 +76,9 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             c = c && p.js.every((t: any) => {
                 return t.from && typeof t.from === 'string'
                     && t.to && typeof t.to === 'string'
-                    && t.fileName && typeof t.fileName === 'string';
+                    && t.fileName && typeof t.fileName === 'string'
+                    && (isNil(t.all) || typeof t.all === 'boolean')
+                    ;
             });
         }
         if (c && c.css) {
@@ -81,7 +86,9 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             c = c && p.css.every((t: any) => {
                 return t.from && typeof t.from === 'string'
                     && t.to && typeof t.to === 'string'
-                    && t.fileName && typeof t.fileName === 'string';
+                    && t.fileName && typeof t.fileName === 'string'
+                    && (isNil(t.all) || typeof t.all === 'boolean')
+                    ;
             });
         }
         if (c && c.twee) {
@@ -89,7 +96,9 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             c = c && p.twee.every((t: any) => {
                 return t.from && typeof t.from === 'string'
                     && t.to && typeof t.to === 'string'
-                    && t.passageName && typeof t.passageName === 'string';
+                    && t.passageName && typeof t.passageName === 'string'
+                    && (isNil(t.all) || typeof t.all === 'boolean')
+                    ;
             });
         }
 
@@ -143,6 +152,7 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             }
             // falsy value will be false
             const debugFlag = !!rp.debug;
+            const all = !!rp.all;
             if (debugFlag) {
                 console.log(`[ReplacePatcher] findString :`, rp.fileName, rp.from);
                 console.log(`[ReplacePatcher] Before:`, f.content);
@@ -153,7 +163,11 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
                 this.log.error(`[ReplacePatcher] patchInReplaceParamsItem() cannot find 'from': ${rp.from} in:${rp.fileName}`);
                 continue;
             }
-            f.content = f.content.replace(rp.from, rp.to);
+            if (all) {
+                f.content = f.content.replaceAll(rp.from, rp.to);
+            } else {
+                f.content = f.content.replace(rp.from, rp.to);
+            }
             if (debugFlag) {
                 console.log(`[ReplacePatcher] After:`, f.content);
             }
@@ -172,6 +186,7 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             }
             // falsy value will be false
             const debugFlag = !!rp.debug;
+            const all = !!rp.all;
             if (debugFlag) {
                 console.log(`[ReplacePatcher] findString :`, rp.passageName, rp.from);
                 console.log(`[ReplacePatcher] Before:`, f.content);
@@ -182,7 +197,11 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
                 this.log.error(`[ReplacePatcher] patchInReplaceParamsItemTwee() cannot find 'from': ${rp.from} in:${rp.passageName}`);
                 continue;
             }
-            f.content = f.content.replace(rp.from, rp.to);
+            if (all) {
+                f.content = f.content.replaceAll(rp.from, rp.to);
+            } else {
+                f.content = f.content.replace(rp.from, rp.to);
+            }
             if (debugFlag) {
                 console.log(`[ReplacePatcher] After:`, f.content);
             }
