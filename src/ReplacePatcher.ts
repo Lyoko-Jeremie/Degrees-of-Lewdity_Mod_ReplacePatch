@@ -110,44 +110,45 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             return T.modName === 'ReplacePatcher'
                 && T.addonName === 'ReplacePatcherAddon';
         });
+        const patchingModName: string = ri.mod.name;
         if (!ad) {
             // never go there
-            console.error('[ReplacePatcher] do_patch() (!ad).', [ri.mod]);
+            console.error('[ReplacePatcher] do_patch() (!ad).', [patchingModName, ri.mod]);
             return;
         }
         const params = ad.params;
         if (!this.checkParams(params)) {
-            console.error('[ReplacePatcher] do_patch() (!this.checkParams(p)).', [ri.mod, params]);
-            this.log.error(`[ReplacePatcher] do_patch() invalid params p: ${ri.mod.name} ${JSON.stringify(params)}`);
+            console.error('[ReplacePatcher] do_patch() (!this.checkParams(p)).', [patchingModName, ri.mod, params]);
+            this.log.error(`[ReplacePatcher] do_patch() patch[${patchingModName}] invalid params p: ${ri.mod.name} ${JSON.stringify(params)}`);
             return;
         }
-        console.log('[ReplacePatcher] do_patch() start.', [ri.mod]);
-        this.log.log(`[ReplacePatcher] do_patch() start: ${ri.mod.name}`);
+        console.log('[ReplacePatcher] do_patch() start.', [patchingModName, ri.mod]);
+        this.log.log(`[ReplacePatcher] do_patch() patch[${patchingModName}] start: ${ri.mod.name}`);
         console.log('params.js', params.js);
         console.log('params.css', params.css);
         console.log('params.twee', params.twee);
         if (params.js) {
-            this.patchInReplaceParamsItem(params.js ?? [], sc.scriptFileItems);
+            this.patchInReplaceParamsItem(patchingModName, params.js ?? [], sc.scriptFileItems);
             sc.scriptFileItems.back2Array();
         }
         if (params.css) {
-            this.patchInReplaceParamsItem(params.css ?? [], sc.styleFileItems);
+            this.patchInReplaceParamsItem(patchingModName, params.css ?? [], sc.styleFileItems);
             sc.styleFileItems.back2Array();
         }
         if (params.twee) {
-            this.patchInReplaceParamsItemTwee(params.twee ?? [], sc.passageDataItems);
+            this.patchInReplaceParamsItemTwee(patchingModName, params.twee ?? [], sc.passageDataItems);
             sc.passageDataItems.back2Array();
         }
-        console.log('[ReplacePatcher] do_patch() done.', [ri.mod]);
-        this.log.log(`[ReplacePatcher] do_patch() done: ${ri.mod.name}`);
+        console.log('[ReplacePatcher] do_patch() done.', [patchingModName, ri.mod]);
+        this.log.log(`[ReplacePatcher] do_patch() patch[${patchingModName}] done: ${ri.mod.name}`);
     }
 
-    patchInReplaceParamsItem(rpi: ReplaceParamsItem[], sc: SC2DataInfo['scriptFileItems'] | SC2DataInfo['styleFileItems']) {
+    patchInReplaceParamsItem(patchingModName: string, rpi: ReplaceParamsItem[], sc: SC2DataInfo['scriptFileItems'] | SC2DataInfo['styleFileItems']) {
         for (const rp of rpi) {
             const f = sc.map.get(rp.fileName);
             if (!f) {
-                console.error('[ReplacePatcher] patchInReplaceParamsItem() (!f).', [rp]);
-                this.log.error(`[ReplacePatcher] patchInReplaceParamsItem() cannot find file: ${rp.fileName}`);
+                console.error(`[ReplacePatcher] patchInReplaceParamsItem() (!f).`, [patchingModName, rp]);
+                this.log.error(`[ReplacePatcher] patchInReplaceParamsItem() patch[${patchingModName}] cannot find file: ${rp.fileName}`);
                 continue;
             }
             // falsy value will be false
@@ -159,8 +160,8 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             }
             const nn = f.content.indexOf(rp.from);
             if (nn < 0) {
-                console.error('[ReplacePatcher] patchInReplaceParamsItem() (f.content.search(rp.from) < 0).', [rp]);
-                this.log.error(`[ReplacePatcher] patchInReplaceParamsItem() cannot find 'from': ${rp.from} in:${rp.fileName}`);
+                console.error('[ReplacePatcher] patchInReplaceParamsItem() (f.content.search(rp.from) < 0).', [patchingModName, rp]);
+                this.log.error(`[ReplacePatcher] patchInReplaceParamsItem() patch[${patchingModName}] cannot find 'from': ${rp.from} in:${rp.fileName}`);
                 continue;
             }
             if (all) {
@@ -171,17 +172,17 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             if (debugFlag) {
                 console.log(`[ReplacePatcher] After:`, f.content);
             }
-            console.log('[ReplacePatcher] patchInReplaceParamsItem() done.', [rp]);
-            this.log.log(`[ReplacePatcher] patchInReplaceParamsItem() done: ${rp.fileName} ${rp.from}`);
+            console.log('[ReplacePatcher] patchInReplaceParamsItem() done.', [patchingModName, rp]);
+            this.log.log(`[ReplacePatcher] patchInReplaceParamsItem() patch[${patchingModName}] done: ${rp.fileName} ${rp.from}`);
         }
     }
 
-    patchInReplaceParamsItemTwee(rpi: ReplaceParamsItemTwee[], sc: SC2DataInfo['passageDataItems']) {
+    patchInReplaceParamsItemTwee(patchingModName: string, rpi: ReplaceParamsItemTwee[], sc: SC2DataInfo['passageDataItems']) {
         for (const rp of rpi) {
             const f = sc.map.get(rp.passageName);
             if (!f) {
-                console.error('[ReplacePatcher] patchInReplaceParamsItemTwee() (!f).', [rp]);
-                this.log.error(`[ReplacePatcher] patchInReplaceParamsItemTwee() cannot find passageName: ${rp.passageName}`);
+                console.error('[ReplacePatcher] patchInReplaceParamsItemTwee() (!f).', [patchingModName, rp]);
+                this.log.error(`[ReplacePatcher] patchInReplaceParamsItemTwee() patch[${patchingModName}] cannot find passageName: ${rp.passageName}`);
                 continue;
             }
             // falsy value will be false
@@ -193,8 +194,8 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             }
             const nn = f.content.indexOf(rp.from);
             if (nn < 0) {
-                console.error('[ReplacePatcher] patchInReplaceParamsItemTwee() (f.content.search(rp.from) < 0).', [rp]);
-                this.log.error(`[ReplacePatcher] patchInReplaceParamsItemTwee() cannot find 'from': ${rp.from} in:${rp.passageName}`);
+                console.error('[ReplacePatcher] patchInReplaceParamsItemTwee() (f.content.search(rp.from) < 0).', [patchingModName, rp]);
+                this.log.error(`[ReplacePatcher] patchInReplaceParamsItemTwee() patch[${patchingModName}] cannot find 'from': ${rp.from} in:${rp.passageName}`);
                 continue;
             }
             if (all) {
@@ -205,8 +206,8 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
             if (debugFlag) {
                 console.log(`[ReplacePatcher] After:`, f.content);
             }
-            console.log('[ReplacePatcher] patchInReplaceParamsItemTwee() done.', [rp]);
-            this.log.log(`[ReplacePatcher] patchInReplaceParamsItemTwee() done: ${rp.passageName} ${rp.from}`);
+            console.log('[ReplacePatcher] patchInReplaceParamsItemTwee() done.', [patchingModName, rp]);
+            this.log.log(`[ReplacePatcher] patchInReplaceParamsItemTwee() patch[${patchingModName}] done: ${rp.passageName} ${rp.from}`);
         }
     }
 
