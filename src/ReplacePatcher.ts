@@ -145,9 +145,9 @@ export class ReplacePatcher implements AddonPluginHookPointEx {
 
     patchInReplaceParamsItem(patchingModName: string, rpi: ReplaceParamsItem[], sc: SC2DataInfo['scriptFileItems'] | SC2DataInfo['styleFileItems']) {
         for (const rp of rpi) {
-            const f = sc.getByNameWithNoPath(rp.fileName);
+            const f = sc.getByNameWithOrWithoutPath(rp.fileName);
             if (!f) {
-                console.error(`[ReplacePatcher] patchInReplaceParamsItem() (!f).`, [patchingModName, rp]);
+                console.error(`[ReplacePatcher] patchInReplaceParamsItem() (!f) cannot find file.`, [patchingModName, rp]);
                 this.log.error(`[ReplacePatcher] patchInReplaceParamsItem() patch[${patchingModName}] cannot find file: ${rp.fileName}`);
                 continue;
             }
